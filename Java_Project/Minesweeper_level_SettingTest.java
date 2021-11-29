@@ -7,7 +7,7 @@ import javax.swing.*;
 class Mine_level_chose extends Minesweeper_Setting{
     int level_chose_num;
     Minesweeper_Setting mineSet;
-    int[][] mine;
+    static int[][] mine;
 
     public Mine_level_chose() {
         this(1);
@@ -24,8 +24,8 @@ class Mine_level_chose extends Minesweeper_Setting{
         check_Mine();
     }
 
-    public void chose_mine() { //create map by level
-        switch (level_chose_num) {//Create
+    public void chose_mine() {//크기생성
+        switch (level_chose_num) {
             case 1:
                 mineSet = new Minesweeper_Setting();
                 mine = new int[getWidth()][getHeight()];
@@ -45,7 +45,7 @@ class Mine_level_chose extends Minesweeper_Setting{
         }
     }
 
-    public void setMine(){ //put mine in map
+    public void setMine(){
         int number = mineSet.getMine_Cnt();
         int x = 0, y = 0;
 
@@ -80,7 +80,6 @@ class Mine_level_chose extends Minesweeper_Setting{
                                 (j == 0 && y == -1) ||
                                 (j == mineSet.getHeight() - 1 && y == 1))
                             && mine[i + x][j + y] == 9) mine_adjacent_cnt++;
-
                     }
                 }
                 mine[i][j] = mine_adjacent_cnt;
@@ -105,7 +104,5 @@ public class Minesweeper_level_SettingTest {
             }
             System.out.println();
         }
-
-//        System.out.println("0, 0 의 타일 Value : " + game.getMineCount(0, 0));
     }
 }
