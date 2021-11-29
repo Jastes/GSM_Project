@@ -5,6 +5,8 @@ import java.awt.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
+import static GSM.Java_Project.Mine_level_chose.mine;
+
 public class Minesweeper_GUI extends JFrame {
 //J_MenuBar setup
     JMenuBar J_Menu = new JMenuBar();
@@ -22,6 +24,8 @@ public class Minesweeper_GUI extends JFrame {
 //Escape
     JMenu sub_file02_end = new JMenu("exit");
     private JButton button[][];
+
+    Mine_level_chose game = new Mine_level_chose();
 
     public Minesweeper_GUI() throws HeadlessException {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -57,60 +61,75 @@ public class Minesweeper_GUI extends JFrame {
         //choose level JMenu_bar event
 
 
+
         for(int i = 0 ; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
-
-//                String temp;
-//                temp = Integer.toString(i*10 + j);
-                /*
-
-                MineButton extend JButton
-                count
-                설정파일 내에다가 getTile(x, y) (x,y) 에 있는 타일의 값 (0~8 이면 근처 지뢰개수, 9면 지뢰)
-                얘를 count 에 대입
-                button[i][j] = new MineButton(getTile(x, y));
-
-                 */
-                //button[i][j] = new MineButton(getTile(x, y));
-
-                //check resource by click in the button
                 AtomicReference<JButton> value = new AtomicReference<>(button[i][j]);   //lambda.. umm..
                 AtomicInteger iValue = new AtomicInteger(i);
                 AtomicInteger jValue = new AtomicInteger(j);
 
                 button[i][j] = new JButton();
-                Mine_level_chose game = new Mine_level_chose();
-                int finalI = i;
-                int finalJ = j;
-                button[i][j].addActionListener(e -> { //lambda execute by click button
-                        showMineCount(iValue.get(), jValue.get(), game.getMineCount(finalI, finalJ));
-                        //button.getCount() button.count
-                        //if (count == 9) Boom(i, j);
-                        //else 버튼 텍스트 전환
 
-                        /*
-                        showNear(x, y)
-                        fun showNear(int x, int y) -> showNear(x-1~x+1, y-1~y+1//맵가장자리면 안하고, (x, y)가 지뢰일떄도 안하고) 숫자보여주기(x, y)
-                         */
+                button[i][j].addActionListener(e -> { //클릭 이벤트 부분
+                    serch(iValue.get(), jValue.get());
                 });
+
+
+
+
                 add(button[i][j]);
             }
         }
     }
 
-    //choose level JMenu_bar event
-    public int leve_chose(){
-        file_diff_easy.addActionListener(e -> {
-            mineSet = new Minesweeper_Setting();
-            mine = new int[getWidth()][getHeight()];
-        });
-        file_diff_normal.addActionListener(e -> {Mine_level_chose(2)});
-        file_diff_hard.addActionListener(e -> {Mine_level_chose(3)});
-        file_diff_Custom.addActionListener(e -> {Mine_level_chose(4)});
-    }
 
-    //show Mine_Counter
-    public void showMineCount(int i, int j, int mineCount) {
+
+    public void serch(int i, int j){
+        int count =0;//비교를 위한 변수
+        if(game.getMineCount(i,j) == 9){//지뢰 체크
+            showMineCount(i,j);
+        }else {
+            for (int ij = -1; ij < 2; ij++) {//주위 돌리는 문1
+                for (int ji = -1; ji < 2; ji++) {//주위 돌리는 문1
+                    try {//테두리 미출력 오류 해결
+                        count = 0;
+                        if (ji == 0 && ij == 0) {//제자리 출력
+                            showMineCount(i + ij, j + ji, game.getMineCount(i, j));
+                        } else {//제자리 이외문
+                            for (int ij2 = -1; ij2 < 2; ij2++) {//숫자 클릭을 위한 문1
+                                for (int ji2 = -1; ji2 < 2; ji2++) {//숫자 클릭을 위한 문2
+                                    if (mine[i + ij2][j + ji2] == 10) {//숫자 비교를 비교하기 위한 문
+                                        count++;
+                                    }
+                                }
+                            }
+                            if (game.getMineCount(i, j) == 0 || game.getMineCount(i, j) != 0 && game.getMineCount(i, j)
+                                    == count) {//주변 출력
+                                try {
+                                    if (game.getMineCount(i + ij, j + ji) == 0) {//0 출력
+                                        showMineCount(i + ij, j + ji, game.getMineCount(i + ij, j + ji));
+                                    } else if (game.getMineCount(i + ij, j + ji) != 0) {//0 이외 출력
+                                        if (game.getMineCount(i + ij, j + ji) != 9) {//9이외 출력
+                                            showMineCount(i + ij, j + ji, game.getMineCount(i + ij, j + ji));
+                                        }
+                                    }
+                                } catch (Exception e) {
+                                }
+                            }
+                        }
+                    }catch (Exception e){}
+                }
+            }
+        }
+    }
+    public void showMineCount(int i, int j) {//지뢰위치 표시용
+        button[i][j].setText("체크");
+        mine[i][j] +=1;
+    }
+    public void showMineCount(int i, int j, int mineCount) {//기본 출력
         button[i][j].setText(mineCount + "");
+        if(mineCount == 10){
+            button[i][j].setText("체크");
+        }
     }
 }
